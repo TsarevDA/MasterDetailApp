@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="debug" name="XMLConfigTest"
+	packages="org.apache.logging.log4j.test">
+	<Properties>
+		<Property name="LOG_PATTERN">%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} %p %m%n
+		</Property>
+	</Properties>
+	<ThresholdFilter level="trace" />
+
+	<Appenders>
+		<JDBC name="databaseAppender" tableName="logging">
+			<ConnectionFactory
+				class="ru.tsarev.masterdetailapp.logging.LogsStoreConnectionFactory"
+				method="getConnection" />
+			<Column name="DATE_TIME" isEventTimestamp="true" />
+			<Column name="CLASS" pattern="%logger" />
+			<Column name="LEVEL" pattern="%level" />
+			<Column name="MESSAGE" pattern="%message" />
+			<Column name="EXCEPTION" pattern="%ex{short}" isClob="true" />
+
+		</JDBC>
+	</Appenders>
+
+	<Loggers>
+		<Root level="warn">
+			<AppenderRef ref="databaseAppender" />
+		</Root>
+
+	</Loggers>
+
+</Configuration>

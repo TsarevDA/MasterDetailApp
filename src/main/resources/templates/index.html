@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html xmlns: th="http://www.thymeleaf.org" lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css"
+	rel="stylesheet">
+<title></title>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<style>
+table {
+	width: 100%; /* Ширина таблицы */
+	border-collapse: collapse; /* Убираем двойные линии между ячейками */
+}
+
+td, th {
+	padding: 3px; /* Поля вокруг содержимого таблицы */
+	border: 1px solid #333; /* Параметры рамки */
+}
+
+th {
+	background: #cadadd; /* Цвет фона заголовка */
+}
+
+tbody tr:hover {
+	background: #65994c; /* Цвет фона при наведении */
+	color: #fff; /* Цвет текста при наведении */
+}
+
+.sortable-td {
+	cursor: pointer;
+}
+
+#table-responsive {
+	overflow-y: scroll;
+	max-height: 400px;
+}
+
+.b-max-divider {
+	height: 3rem;
+}
+
+.b-mini-divider {
+	height: 1rem;
+}
+
+.popup {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	top: 0; 
+	left: 0;
+	opacity: 0;
+	visibility: hidden;
+}
+
+.popup:target {
+	opacity: 1;
+	visibility: visible;
+}
+
+.popup_area {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
+.popup_body {
+	min-height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 30px 10px;
+}
+
+.popup_content {
+	background-color: #fff;
+	color: #000;
+	max-width: 800px;
+	padding: 30 px;
+	position: relative;
+}
+
+.popup_close {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	font-size: 20px;
+	color: #000;
+	text-decoration: none;
+}
+
+.popup_title {
+font-size: 30px;
+margin: 0px 0px 10px 0px;
+text-align: center;
+color: #C00;}
+
+.popup_text {
+margin: 0px 10px 10px 10px;
+}
+</style>
+
+<body class="p-3 m-0 border-0 bd-example">
+
+	<nav class="navbar bg-light">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">Документ</a>
+		</div>
+	</nav>
+
+
+	<div class="b-mini-divider"></div>
+
+	<div class="row">
+		<div class="col">
+			<button class="btn btn-secondary" type="button"
+				data-bs-toggle="collapse" data-bs-target="#documentNavbar"
+				aria-controls="documentNavbar">Добавить документ</button>
+		</div>
+	</div>
+
+	<div class="collapse navbar-collapse" id="documentNavbar">
+
+
+		<div class="b-mini-divider"></div>
+
+		<div class="container border" align="center">
+			<form action="#" th:action="@{/documents/create}" method="post"
+				th:object="${document}">
+				<div class="row">
+					<span class="fs-5 fw-semibold"><strong>Добавить
+							документ</strong></span>
+				</div>
+				<div class="row">
+
+					<div class="col">
+						<span class="fs-5 fw-semibold"><strong>Номер</strong></span>
+					</div>
+					<div class="col">
+						<input type="text" th:field="*{number}" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<span class="fs-5 fw-semibold"><strong>Дата</strong></span>
+					</div>
+					<div class="col">
+						<input type="text" th:field="*{creationDate}" />
+					</div>
+				</div>
+				<div class="row">
+
+					<div class="col">
+						<span class="fs-5 fw-semibold"><strong>Примечание</strong></span>
+					</div>
+					<div class="col">
+						<input type="text" th:field="*{note}" />
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col">
+						<input type="submit" value="Add" />
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="b-mini-divider"></div>
+	</div>
+	<div class="b-mini-divider"></div>
+
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">Номер</th>
+				<th scope="col">Дата</th>
+				<th scope="col">Сумма</th>
+				<th scope="col">Примечание</th>
+				<th scope="col">Действие</th>
+			</tr>
+		</thead>
+		<tbody>
+			<div th:each="currentDocument : ${documents}"
+				th:with="condition = ${currentDocument.getId()} eq ${selectedId}"
+				th:class="${ condition ? 'table-success' : 'table-Default'}">
+				<tr>
+
+					<td class="sortable-td" th:text="${currentDocument.getNumber()}"
+						th:attr="onclick=|document.location='documents?id=${currentDocument.getId()}&page=${documents.number}&size=${documents.size}'|"></td>
+					<td class="sortable-td"
+						th:text="${currentDocument.getCreationDate()}"
+						th:attr="onclick=|document.location='documents?id=${currentDocument.getId()}&page=${documents.number}&size=${documents.size}'|"></td>
+					<td class="sortable-td"
+						th:text="${currentDocument.getFinalPrice()}"
+						th:attr="onclick=|document.location='documents?id=${currentDocument.getId()}&page=${documents.number}&size=${documents.size}'|"></td>
+					<td class="sortable-td" th:text="${currentDocument.getNote()}"
+						th:attr="onclick=|document.location='documents?id=${currentDocument.getId()}&page=${documents.number}&size=${documents.size}'|"></td>
+					<td><a
+						th:href="@{documents/delete?id={id}(id=${currentDocument.getId()})}"><button
+								type="button" class="btn btn-secondary">Удалить</button></a>
+						<button type="button" class="btn btn-secondary"
+							data-bs-toggle="collapse"
+							th:attr="data-bs-target='#documentUpdateNavbar' + ${currentDocument.getId()},
+							aria-controls='documentUpdateNavbar'+ ${currentDocument.getId()}">Обновить</button></td>
+				</tr>
+
+
+				<div class="collapse navbar-collapse"
+					th:attr="id = 'documentUpdateNavbar'+ ${currentDocument.getId()}">
+					<div class="b-mini-divider"></div>
+					<div class="container border" align="center">
+						<form action="#" th:action="@{/documents/update}" method="post"
+							th:object="${document}">
+							<div class="row">
+								<span class="fs-5 fw-semibold"><strong>Обновить
+										документ</strong></span>
+							</div>
+
+							<div class="row">
+								<input type="hidden" name="id"
+									th:value="${currentDocument.getId()}" />
+							</div>
+
+							<div class="row">
+								<div class="col">
+									<span class="fs-5 fw-semibold"><strong>Номер</strong></span>
+								</div>
+								<div class="col">
+									<input type="text" name="number"
+										th:value="${currentDocument.getNumber()}" />
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col">
+									<span class="fs-5 fw-semibold"><strong>Дата</strong></span>
+								</div>
+								<div class="col">
+									<input type="text" name="creationDate"
+										th:value="${currentDocument.getCreationDate()}" />
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col">
+									<span class="fs-5 fw-semibold"><strong>Примечание</strong></span>
+								</div>
+								<div class="col">
+									<input type="text" name="note"
+										th:value="${currentDocument.getNote()}" />
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col">
+									<input type="submit" value="Update" />
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="b-mini-divider"></div>
+				</div>
+
+			</div>
+		</tbody>
+	</table>
+
+	<ul class="pagination" th:if="${documents.getTotalPages() - 1 > 0}">
+		<li class="page-item"
+			th:each="pageNumber : ${#numbers.sequence(0, (documents.getTotalPages() - 1))}"
+			th:class="${pageNumber==documents.number} ? active"><a
+			class="page-link" th:href="@{/(page=${pageNumber}, size=5)}"
+			th:text="${pageNumber+1}"></a></li>
+	</ul>
+
+	<div class="b-mini-divider"></div>
+
+	<nav class="navbar bg-light">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">Позиция</a>
+		</div>
+	</nav>
+
+	<div class="b-mini-divider"></div>
+
+	<div class="row">
+		<div class="col">
+			<button class="btn btn-secondary" type="button"
+				data-bs-toggle="collapse" data-bs-target="#positionNavbar"
+				aria-controls="positionNavbar">Добавить позицию</button>
+		</div>
+	</div>
+
+	<div class="collapse navbar-collapse" id="positionNavbar">
+
+		<div class="b-mini-divider"></div>
+
+		<div class="container border" align="center">
+			<form action="#" th:action="@{/positions/create}" method="post"
+				th:object="${position}">
+
+				<div class="row">
+					<span class="fs-5 fw-semibold"><strong>Добавить
+							позицию</strong></span>
+				</div>
+
+				<div class="row"></div>
+
+				<div class="row">
+
+					<div class="col">
+						<span class="fs-5 fw-semibold"><strong>Номер</strong></span>
+					</div>
+					<div class="col">
+						<input type="text" name="number" />
+					</div>
+				</div>
+
+				<div class="row">
+
+					<div class="col">
+						<span class="fs-5 fw-semibold"><strong>Название</strong></span>
+					</div>
+					<div class="col">
+						<input type="text" name="name" />
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col">
+						<span class="fs-5 fw-semibold"><strong>Цена</strong></span>
+					</div>
+					<div class="col">
+						<input type="text" name="price"
+							oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" />
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col">
+						<span class="fs-5 fw-semibold"><strong>Количество</strong></span>
+					</div>
+					<div class="col">
+						<input type="text" name="amount"
+							oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" />
+					</div>
+				</div>
+
+
+				<div class="row">
+					<div class="col">
+						<span class="fs-5 fw-semibold"><strong>Документ</strong></span>
+					</div>
+					<div class="col">
+						<select th:field="*{owner}">
+							<option th:each="currentDocument : ${documents}"
+								th:value="${currentDocument.id}"
+								th:text="${currentDocument.number}"></option>
+						</select>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col">
+						<input type="submit" value="Add" />
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="b-mini-divider"></div>
+	</div>
+
+
+
+	<div class="b-mini-divider"></div>
+
+	<div id="table-responsive">
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Номер</th>
+					<th scope="col">Наименование</th>
+					<th scope="col">Цена</th>
+					<th scope="col">Количество</th>
+					<th scope="col">Действие</th>
+				</tr>
+			</thead>
+			<tbody>
+				<div th:each="currentPosition : ${positions}">
+					<tr>
+						<td th:text="${currentPosition.getNumber()}"></td>
+						<td th:text="${currentPosition.getName()}"></td>
+						<td th:text="${currentPosition.getPrice()}"></td>
+						<td th:text="${currentPosition.getAmount()}"></td>
+						<td><a
+							th:href="@{positions/delete?id={id}(id=${currentPosition.getId()})}"><button
+									type="button" class="btn btn-secondary">Удалить</button></a>
+							<button type="button" class="btn btn-secondary"
+								data-bs-toggle="collapse"
+								th:attr="data-bs-target='#positionUpdateNavbar' + ${currentPosition.getId()},
+							aria-controls='positionUpdateNavbar'+ ${currentPosition.getId()}">Обновить</button>
+							</a></td>
+					</tr>
+
+					<div class="collapse navbar-collapse"
+						th:attr="id = 'positionUpdateNavbar'+ ${currentPosition.getId()}">
+						<div class="b-mini-divider"></div>
+						<div class="container border" align="center">
+							<form action="#" th:action="@{/positions/update}" method="post"
+								th:object="${position}">
+								<div class="row">
+									<span class="fs-5 fw-semibold"><strong>Обновить
+											позицию</strong></span>
+								</div>
+
+								<div class="row">
+									<input type="hidden" name="id"
+										th:value="${currentPosition.getId()}" />
+								</div>
+
+								<div class="row">
+									<div class="col">
+										<span class="fs-5 fw-semibold"><strong>Номер</strong></span>
+									</div>
+									<div class="col">
+										<input type="text" th:value="${currentPosition.getNumber()}"
+											name="number" />
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col">
+										<span class="fs-5 fw-semibold"><strong>Название</strong></span>
+									</div>
+									<div class="col">
+										<input type="text" th:value="${currentPosition.getName()}"
+											name="name" />
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col">
+										<span class="fs-5 fw-semibold"><strong>Цена</strong></span>
+									</div>
+									<div class="col">
+										<input type="text" name="price"
+											oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');"
+											th:value="${currentPosition.getPrice()}" />
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col">
+										<span class="fs-5 fw-semibold"><strong>Количество</strong></span>
+									</div>
+									<div class="col">
+										<input type="text" name="amount"
+											oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');"
+											th:value="${currentPosition.getAmount()}" />
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col">
+										<span class="fs-5 fw-semibold"><strong>Документ</strong></span>
+									</div>
+									<div class="col">
+										<select name="owner">
+											<option th:each="currentDocument : ${documents}"
+												th:value="${currentDocument.id}"
+												th:text="${currentDocument.number}"
+												th:selected="${currentDocument.id == selectedId}"></option>
+										</select>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col">
+										<input type="submit" value="Update" />
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="b-mini-divider"></div>
+					</div>
+
+				</div>
+
+			</tbody>
+		</table>
+	</div>
+
+	<div class="b-mini-divider"></div>
+
+<div id="error" class="popup">
+<a href="/" class= "popup_area"> </a>
+	<div class = "popup_body">
+		<div class = "popup_content">
+		<a href="/" class="popup_close"> &times; </a>
+		<div class="popup_title">Ошибка</div>
+		<div class="popup_text" th:text="${exceptionMessage}"></div>
+		</div>
+	</div>
+</div>
+
+
+
+</body>
+</html>
