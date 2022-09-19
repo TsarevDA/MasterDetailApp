@@ -11,16 +11,15 @@ public class LogsStoreConnectionFactory
 
 	private LogsStoreConnectionFactory() {
 	}
-
+	
 	public static Connection getConnection() throws SQLException {
 		if (dataSource == null) {
 			dataSource = new BasicDataSource();
-			dataSource.setUrl("jdbc:h2:~/test2;TRACE_LEVEL_SYSTEM_OUT=2;");
+			dataSource.setUrl("jdbc:h2:~/test;TRACE_LEVEL_SYSTEM_OUT=2;");
 			dataSource.setDriverClassName("org.h2.Driver");
 			dataSource.setUsername("sa");
 			dataSource.setPassword("");
 		}
 		return dataSource.getConnection();
-	}
-	
+	}	
 }

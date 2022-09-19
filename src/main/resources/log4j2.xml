@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Configuration status="debug" name="XMLConfigTest"
-	packages="org.apache.logging.log4j.test">
+<Configuration>
 	<Properties>
 		<Property name="LOG_PATTERN">%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} %p %m%n
 		</Property>
 	</Properties>
-	<ThresholdFilter level="trace" />
+	
 
 	<Appenders>
 		<JDBC name="databaseAppender" tableName="logging">
@@ -23,6 +22,12 @@
 	</Appenders>
 
 	<Loggers>
+
+		<Logger name="ru.tsarev.masterdetailapp.controller"
+			level="warn" additivity="false">
+			<AppenderRef ref="databaseAppender" />
+		</Logger>
+
 		<Root level="warn">
 			<AppenderRef ref="databaseAppender" />
 		</Root>

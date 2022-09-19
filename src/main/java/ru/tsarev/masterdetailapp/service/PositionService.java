@@ -36,12 +36,7 @@ public class PositionService {
 	@Transactional
 	public void create(Position position) {
 
-		Position newPos = getByNameAndPriceAndOwner(position);
-		if (newPos != null) {
-			newPos.setAmount(newPos.getAmount() + position.getAmount());
-			update(newPos);
-		} else
-			positionRepository.save(position);
+		positionRepository.save(position);
 	}
 
 	@Transactional
